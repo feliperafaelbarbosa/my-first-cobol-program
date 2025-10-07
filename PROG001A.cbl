@@ -18,8 +18,8 @@
            05 WS-DATA3-MES    PIC X(02).
            05 FILLER          PIC X(01).
            05 WS-DATA3-ANO    PIC X(04).
-      * TIME
-       01 WS-TIME    PIC X(12) VALUE SPACES.
+      * TIME - HHMMSSmm
+       01 WS-TIME    PIC X(08) VALUE SPACES.
        01 WS-TIME2   PIC X(10) VALUE SPACES.
        01 WS-TIME3   REDEFINES WS-TIME2.
            05 WS-TIME3-HOR    PIC X(02).
@@ -28,7 +28,11 @@
            05 FILLER          PIC X(01).
            05 WS-TIME3-SEG    PIC X(02).
 
-       01 WS-NOME   PIC X(25) VALUE SPACES.
+       01 WS-NOME    PIC X(25) VALUE SPACES.
+       01 WS-NOME2   PIC X(25) VALUE SPACES.
+
+       01 WS-IND     PIC 9(02) VALUE ZEROS.
+       01 WS-IND1     PIC 9(02) VALUE ZEROS.
       *----------------------------------------------------------------- 
        PROCEDURE DIVISION.
        
@@ -71,10 +75,57 @@
       *----------------------------------------------------------------- 
        0003-NOME.
            DISPLAY "0003-NOME" 
-           MOVE "FELIPE RAFAEL BARBOSA" TO WS-NOME
+
+           IF WS-TIME3-HOR EQUAL 01 THEN
+               IF WS-TIME3-MIN GREATER 50 THEN
+                   MOVE "FELIPE RAFAEL BARBOSA" TO WS-NOME
+               ELSE
+                   MOVE "PROGRAMA 01" TO WS-NOME
+               END-IF
+           ELSE
+               IF WS-DATA3-DIA EQUAL 04 THEN   
+                   MOVE "COBOL DICAS" TO WS-NOME
+               ELSE
+                   MOVE "PROGRAMA 02" TO WS-NOME
+                   GO TO 9999-FINALIZAR
+               END-IF
+           END-IF.
+
            DISPLAY "NOME: " WS-NOME
-           .  
-       0003-END.  
+
+           EVALUATE WS-DATA3-MES
+           WHEN 01
+               MOVE "JANEIRO" TO WS-NOME2
+           WHEN 02
+               MOVE "FEVEREIRO" TO WS-NOME2
+           WHEN 03
+               MOVE "MARÇO" TO WS-NOME2
+           WHEN 04
+               MOVE "ABRIL" TO WS-NOME2
+           WHEN 05
+               MOVE "MAIO" TO WS-NOME2
+           WHEN 06
+               MOVE "JUNHO" TO WS-NOME2
+           WHEN 10
+               MOVE "OUTUBRO" TO WS-NOME2
+           END-EVALUATE
+
+           DISPLAY "NOME: " WS-NOME2
+
+           PERFORM 0004-CONDICAO1 UNTIL WS-IND EQUAL 5
+           .
+       0003-END.
+
+       0004-CONDICAO1.
+           ADD 1 TO WS-IND
+
+           PERFORM VARYING WS-IND1 FROM 1 BY 1 UNTIL WS-IND1 GREATER 2
+               DISPLAY "UNTIL" WS-IND " VARYING" WS-IND1
+               GO TO 0004-END
+           END-PERFORM
+           .
+       0004-END.
+
       *----------------------------------------------------------------- 
        9999-FINALIZAR.  
            DISPLAY "FIM DO PROGRAMA" 
